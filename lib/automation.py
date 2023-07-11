@@ -19,7 +19,7 @@ logger = Logger.get_instance()
 
 
 async def browser_local():
-    logger.info("browser_local")
+    # logger.info("browser_local")
     # chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
     return webdriver.Chrome('./chromedriver/chromedriver')
 
@@ -75,17 +75,12 @@ class Automation:
 
     async def generate_doordash_account(self):
         CountryId = '1'
-        profile = fake.simple_profile()
-        # user = {'firstName':fake.person.firstName,'lastName':fake.person.lastName, 'email':fake.internet.email ,'username': profile['username'], 'password': fake.password(length=12),
-        #         'name': profile['name']}
-        username: profile['username']
-        password: fake.password(length=12)
-        name: profile['name']
-        firstName = fake.person.firstName()
-        lastName =fake.person.lastName()
-        email:fake.internet.email()
+        profile = fake.profile()
+        user = {'firstName':fake.first_name(),'lastName':fake.last_name(), 'email':fake.email() ,'phoneNumber' : fake.phone_number(), 'password': fake.password(length=12),
+                'name': profile['name']}
+        
 
-        print('[UserInformation]',firstName,lastName,email,username,password,name)
+        print(f'[UserInformation],{user}')
 
 
 
@@ -111,9 +106,9 @@ class Automation:
         # if message.startswith('This country is currently not available for this service'):
         #     print('[Error Message]', {'jsonData': jsonData})
 
-        # browser = await self.get_browser()
+        browser = await self.get_browser()
 
-        # await signup(self.environment, browser, user)
+        await signup(self.environment, browser, user)
 
     async def get_browser(self):
         browser = await browser_multilogin(self.profile_id) \
