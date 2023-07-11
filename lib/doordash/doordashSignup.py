@@ -22,40 +22,37 @@ async def signup(environment, browser, user):
     span.click()
     # Wait until the element is present
     wait = WebDriverWait(browser, 30)  # Maximum wait time of 10 seconds
-    inputEmailOrPhone = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=emailOrPhone]")))
-    await asyncio.sleep(0.3)
-    for char in user['number']:
-        inputEmailOrPhone.send_keys(char)
-        await asyncio.sleep(0.5)
-    await asyncio.sleep(0.5)
-    inputFullName = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=fullName]")))
-    for char in user['name']:
+    inputFirstName = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[data-anchor-id=IdentitySignupFirstNameField]")))
+    for char in user['firstName']:
         inputFullName.send_keys(char)
         await asyncio.sleep(0.5)
-    await asyncio.sleep(0.7)
-    inputUsername = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=username]")))
-    for char in user['username']:
-        inputUsername.send_keys(char)
+    await asyncio.sleep(0.3)
+    inputLastName = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[data-anchor-id=IdentitySignupLastNameField]")))
+    for char in user['firstName']:
+        inputFullName.send_keys(char)
         await asyncio.sleep(0.5)
+    await asyncio.sleep(0.3)
 
-    inputUsername.send_keys(Keys.TAB + Keys.SPACE)
-    await asyncio.sleep(1)
-    # browser.send_keys(Keys.SPACE)
-    await asyncio.sleep(1.3)
-    # submitButton = browser.find_element_by_xpath('//button[@type="button"]')
-    # submitButton.click()
-    await asyncio.sleep(1.3)
-    generatedUsername = inputUsername.get_attribute("value")
-    user['username'] = generatedUsername
-    await asyncio.sleep(2)
-    inputPassword = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=password]")))
+    inputEmail = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[data-anchor-id=IdentitySignupEmailField]")))
+    await asyncio.sleep(0.3)
+    for char in user['email']:
+        inputEmail.send_keys(char)
+        await asyncio.sleep(0.5)
+    await asyncio.sleep(0.5)
+    inputPhone = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[data-anchor-id=IdentitySignupPhoneField]")))
+    await asyncio.sleep(0.3)
+    for char in user['number']:
+        inputPhone.send_keys(char)
+        await asyncio.sleep(0.5)
+    await asyncio.sleep(0.5)
+    inputPassword = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[data-anchor-id=IdentitySignupPasswordField]")))
     for char in user['password']:
         inputPassword.send_keys(char)
         await asyncio.sleep(0.5)
 
     await asyncio.sleep(0.7)
-    submitButton = browser.find_element_by_xpath('//button[@type="submit"]')
-    submitButton.click()
+    signupButton = browser.find_element_by_xpath('//span[text()="Sign Up"]')
+    signupButton.click()
     await asyncio.sleep(4)
 
     # async def add_account_data_to_profile():
