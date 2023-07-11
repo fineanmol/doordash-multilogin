@@ -1,0 +1,9 @@
+__pycache__/
+multilogin.log
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/multilogin-python.iml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+.vscode/settings.json
