@@ -1,9 +1,9 @@
 import asyncio
 import os
 
-# from aioconsole import ainput
+from aioconsole import ainput
 
-# from httpClient import HttpClient
+from httpClient import HttpClient
 from lib.automation import Automation
 from logger import Logger
 
@@ -11,10 +11,11 @@ logger = Logger.get_instance()
 
 
 async def main():
+    await sign_in_doordash_account()
     actions = {
         '1': create_multilogin_profile,
         '2': create_doordash_account,
-        '3': exit_program,
+        '3': crawl,
         '4': exit_program,
 
     }
@@ -24,7 +25,7 @@ async def main():
               'Enter action to perform.\n' +
               '1. Create Multilogin Profile\n' +
               '2. Create Doordash Account\n' +
-              '3. Create Order \n' +
+              '3. Crawl \n' +
               '4. Exit\n' +
               '\n')
 
@@ -57,18 +58,7 @@ async def create_doordash_account():
 
 async def sign_in_doordash_account():
     bot = Automation('dummyUUid')
-    await bot.sign_in_to_doordash()
-
-
-async def run_scheduler():
-    bot = Automation('dummyUUid')
-    # await bot.sign_in_to_doordash()
-    # await schedule_and_execute_tasks(bot)
-
-
-async def modify_scheduler():
-    bot = Automation('dummyUUid')
-    # await bot.doordash_sign_in()
+    await bot.sign_in_to_doordash({})
 
 
 def exit_program():
@@ -77,12 +67,14 @@ def exit_program():
 
 
 async def crawl():
-    jsonData = await HttpClient("http://localhost:3001").get("/profile/unused")
-    for profile in jsonData['profiles']:
-        logger.info(profile['uuid'])
-        bot = Automation(profile['uuid'])
-        await bot.create_browser_history()
-
+    #jsonData = await HttpClient("http://localhost:3001").get("/profile/unused")
+    # for profile in jsonData['profiles']:
+    #     logger.info(profile['uuid'])
+    #     bot = Automation(profile['uuid'])
+    #     await bot.create_browser_history()
+    bot = Automation("profile['uuid']")
+    await bot.create_browser_history()
+    await create_doordash_account()
 
 async def upload_profile_photo():
     bot = Automation("")
