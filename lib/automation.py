@@ -11,7 +11,9 @@ from lib.pexel_api import download_random_image
 from logger import Logger
 from constant import services
 from httpClient import HttpClient
+import undetected_chromedriver as uc
 
+from util.utility import generate_random_email, generate_us_phone_number, generate_us_city_address, generate_profile
 
 fake = Faker()
 service_list = services.ServiceList()
@@ -21,7 +23,28 @@ logger = Logger.get_instance()
 async def browser_local():
     # logger.info("browser_local")
     # chromedriver_autoinstaller.install()  # Check if the current version of chromedriver exists
-    return webdriver.Chrome('./chromedriver/chromedriver')
+    # return webdriver.Chrome('./chromedriver/chromedriver')
+    options = uc.ChromeOptions()
+    # options.add_argument("start-maximized")
+    # options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    # options.add_experimental_option('useAutomationExtension', False)
+    options.add_argument('--no-sandbox')  # Bypass the sandbox mode
+    options.add_argument('--disable-dev-shm-usage')  # Disable /dev/shm usage
+    options.add_argument('--disable-blink-features=AutomationControlled')  # Disable automation detection
+
+    options.add_argument("--auto-open-devtools-for-tabs")
+    driver = uc.Chrome(options)
+
+    # Set the navigator properties to mimic a real browser
+    # driver.implicitly_wait(10)
+    # driver.execute_cdp_cmd('Network.enable', {})
+    # driver.execute_cdp_cmd('Network.emulateNetworkConditions', {
+    #     'offline': False,
+    #     'downloadThroughput': 750 * 1024,
+    #     'uploadThroughput': 250 * 1024,
+    #     'latency': 50
+    # })
+    return driver
 
 
 # Read the configuration file
@@ -75,14 +98,12 @@ class Automation:
 
     async def generate_doordash_account(self):
         CountryId = '1'
-        profile = fake.profile()
-        user = {'firstName':fake.first_name(),'lastName':fake.last_name(), 'email':fake.email() ,'phoneNumber' : fake.phone_number(), 'password': fake.password(length=12),
-                'name': profile['name']}
-        
+        profile = generate_profile()
+        user = {'firstName': profile['name'].split(" ")[0], 'lastName': profile['name'].split(" ")[1], 'email': profile['mail'],
+                'phoneNumber': generate_us_phone_number(), 'password': fake.password(length=12),
+                'name': profile['name'], 'address': generate_us_city_address("")}
 
         print(f'[UserInformation],{user}')
-
-
 
         for element in service_list.get_services():
             if element.name == 'United States':
@@ -102,7 +123,6 @@ class Automation:
         # user['orderId'] = orderId
         # user['key'] = self.environment['key']
 
-        
         # if message.startswith('This country is currently not available for this service'):
         #     print('[Error Message]', {'jsonData': jsonData})
 

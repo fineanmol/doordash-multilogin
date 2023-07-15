@@ -32,70 +32,85 @@ def load_cookie(browser, filename):
     except IOError:
         logger.info("An error occurred while reading cookies file")
     except Exception as e:
-        logger.info("An unexpected error occurred:"+ str(e))
+        logger.info("An unexpected error occurred:" + str(e))
 
 
-async def signin(browser,user):
-    # user = {
-    #     'email': 'jasonford468',
-    #     'password': ')7Y9sxfJJ&4Q'
-    # }
-    # logger.info("Starting sigin: "+user)
+async def signin(browser, user):
+    user = {
+        'email': 'nikhilnishadatuk+spam@gmail.com',
+        'password': 'Zxcvbnm#123'
+    }
+    # logger.info("Starting sigin: " + user)
     browser.get('https://doordash.com')
     await asyncio.sleep(2)
-    load_cookie(browser, user['username'])
+    load_cookie(browser, user['email'])
     await asyncio.sleep(2)
     browser.get('https://doordash.com')
     await asyncio.sleep(2)
     try:
-        logger.info("Clinking accept cookies")
-        accept_cookies_button = browser.find_element_by_xpath('//button[text()="Allow all cookies"]')
-        accept_cookies_button.click()
-    except Exception as e:
-        logger.info("Accept cookie button not found!")
+        acceptAllButton = browser.find_element(By.XPATH, "//button[@id='cassie_accept_all_pre_banner']")
+        acceptAllButton.click()
+    except:
+        logger.info("Cookieee popup not found!")
     await asyncio.sleep(5)
     # Check if element with id "myElement" exists
-    elements = browser.find_elements_by_xpath('//div[text()="Log in"]')
+    elements = browser.find_elements(By.XPATH, '//span[text()="Sign In"]')
     if len(elements) > 0:
         logger.info("Not logged In")
-        # Wait until the elements are present
-        wait = WebDriverWait(browser, 30)  # Maximum wait time of 30 seconds
-        input_email_or_phone = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=username]")))
-        input_email_or_phone.send_keys(user.get('username'))
 
-        password = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "input[name=password]")))
-        password.send_keys(user.get('password'))
+        elements[0].click()
+        await asyncio.sleep(3)
+        # Wait until the element is present
+        iframe = browser.find_element(By.XPATH, "//iframe[@title='Login/Signup']")
+        browser.switch_to.frame(iframe)
 
-        signin_button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[contains(.,"Log in")]')))
+        await asyncio.sleep(5)
+
+        inputEmail = browser.find_element(By.XPATH, "//input[@data-anchor-id='IdentityLoginPageEmailField']")
+        for char in user['email']:
+            inputEmail.send_keys(char)
+            await asyncio.sleep(0.5)
+
+        nextToPassword = browser.find_element(By.XPATH, '//span[text()="Continue to Sign In"]')
+        nextToPassword.click()
+        await asyncio.sleep(3)
+
+        try:
+            buttonToSwitchToPassword = browser.find_element(By.XPATH, '//span[text()="Use password instead"]')
+            buttonToSwitchToPassword.click()
+
+        except:
+            logger.info("OTP component not found")
+        await asyncio.sleep(2)
+
+        inputPassword = browser.find_element(By.XPATH, "//input[@data-anchor-id='IdentityLoginPagePasswordField']")
+        for char in user['password']:
+            inputPassword.send_keys(char)
+            await asyncio.sleep(0.5)
+
+        signin_button = browser.find_element(By.XPATH, '//span[text()="Sign In"]')
         await asyncio.sleep(4)
         signin_button.click()
 
         time.sleep(5)
         logger.info('Login Success, Ready for the next step..')
-        try:
-            save_your_login_info_button = browser.find_element_by_xpath('//button[@type="button"]')
-            save_your_login_info_button.click()
-        except:
-            logger.info("Save Login Details Popup not available")
+        browser.switch_to.default_content()
     else:
         logger.info("Already Logged In")
         time.sleep(2)
-    try:
-        button_notification = browser.find_element_by_xpath('//button[text()="Not Now"]')
-        button_notification.click()
-    except:
-        logger.info("Turn On Notification popup not found")
     await asyncio.sleep(2)
-    save_cookie(browser, user['username'])
+    save_cookie(browser, user['email'])
     await asyncio.sleep(5)
 
 
-async def update_profile_bio(browser,user, quote):
+async def update_profile_bio(browser, user, quote):
     try:
-       pass
+        pass
 
     except Exception as e:
         logger.info(f"An error occurred: {e}")
 
     finally:
         browser.quit()
+
+# //span[contains(text(), "Get $") and contains(text(), " in Credits")]
