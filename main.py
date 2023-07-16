@@ -15,7 +15,8 @@ async def main():
         '1': create_multilogin_profile,
         '2': create_doordash_account,
         '3': sign_in_doordash_account,
-        '4': exit_program,
+        '4': generate_proxys,
+        '5': exit_program,
     }
 
     while True:
@@ -24,7 +25,8 @@ async def main():
               '1. Create Multilogin Profile\n' +
               '2. Create Doordash Account\n' +
               '3. SignIn Account \n' +
-              '4. Exit\n' +
+              '4. Generate Proxy/s \n' +
+              '5. Exit\n' +
               '\n')
 
         user_input = input("Please enter your input: ")
@@ -60,13 +62,19 @@ async def sign_in_doordash_account():
     await bot.sign_in_to_doordash(profile['family']['parent'])
 
 
+async def generate_proxys():
+    proxy_count = await ainput("Input number of proxy/s to be created: ")
+    jsonData = await HttpClient("http://localhost:3001").post(f"/proxy/generate/{proxy_count}")
+    logger.info(jsonData)
+
+
 def exit_program():
     print("Exiting...")
     raise SystemExit
 
 
 async def crawl():
-    #jsonData = await HttpClient("http://localhost:3001").get("/profile/unused")
+    # jsonData = await HttpClient("http://localhost:3001").get("/profile/unused")
     # for profile in jsonData['profiles']:
     #     logger.info(profile['uuid'])
     #     bot = Automation(profile['uuid'])
@@ -74,6 +82,7 @@ async def crawl():
     bot = Automation("profile['uuid']")
     await bot.create_browser_history()
     await create_doordash_account()
+
 
 async def upload_profile_photo():
     bot = Automation("")
