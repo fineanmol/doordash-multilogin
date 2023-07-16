@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pickle
 
 from logger import Logger
+from util.utility import verify_phone
 
 logger = Logger.get_instance()
 
@@ -35,11 +36,11 @@ def load_cookie(browser, filename):
         logger.info("An unexpected error occurred:" + str(e))
 
 
-async def signin(browser, user):
-    user = {
-        'email': 'nikhilnishadatuk+spam@gmail.com',
-        'password': 'Zxcvbnm#123'
-    }
+async def signin(environment, browser, user):
+    # user = {
+    #     'email': 'nikhilnishadatuk+spam@gmail.com',
+    #     'password': 'Zxcvbnm#123'
+    # }
     # logger.info("Starting sigin: " + user)
     browser.get('https://doordash.com')
     await asyncio.sleep(2)
@@ -98,9 +99,16 @@ async def signin(browser, user):
     else:
         logger.info("Already Logged In")
         time.sleep(2)
+    try:
+        time.sleep(1)
+        browser.find_element(By.XPATH,"//span[text()='Skip']").click()
+    except:
+        logger.info("Suggestion Popup not found")
     await asyncio.sleep(2)
     save_cookie(browser, user['email'])
     await asyncio.sleep(5)
+
+    await verify_phone(browser, environment, user)
 
 
 async def update_profile_bio(browser, user, quote):

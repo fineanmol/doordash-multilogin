@@ -12,6 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 from httpClient import HttpClient
+from util.utility import fetch_otp_details, verify_phone
 
 logger = Logger.get_instance()
 
@@ -39,7 +40,24 @@ def load_cookie(browser, filename):
         logger.info("An unexpected error occurred:" + str(e))
 
 
-async def signup(environment, browser, user):
+async def add_account_data_to_profile(profile_id, user):
+    await asyncio.sleep(4)
+    url = "http://localhost:3001"
+    account_details = {
+        "parentEmail": user['email'],
+        "parentPassword": user['password'],
+        "parentPhone": user['phoneNumber'],
+        "parentAddress": user['address'],
+        "orderId": user['orderId'],
+        "key": user['key']
+    }
+
+    logger.info(account_details)
+    json_response = await HttpClient(url).post(f"/profile/{profile_id}/family/parent", account_details)
+    logger.info(json_response)
+
+
+async def signup(profile_id, environment, browser, user):
     # browser.execute_script("window.devtools.open()")
     browser.get('https://doordash.com')
     await asyncio.sleep(2)
@@ -55,7 +73,7 @@ async def signup(environment, browser, user):
         logger.info("Cookieee popup not found!")
 
     await asyncio.sleep(4)
-    save_cookie(browser, "doordash")
+    save_cookie(browser, user['email'])
 
     try:
         signUpButton = browser.find_element(By.XPATH, '//span[text()="Sign Up"]')
@@ -72,13 +90,13 @@ async def signup(environment, browser, user):
             inputFirstName.send_keys(char)
             await asyncio.sleep(0.5)
         await asyncio.sleep(0.3)
-        inputLastName = browser.find_element(By.XPATH,  "//input[@data-anchor-id='IdentitySignupLastNameField']")
+        inputLastName = browser.find_element(By.XPATH, "//input[@data-anchor-id='IdentitySignupLastNameField']")
         for char in user['lastName']:
             inputLastName.send_keys(char)
             await asyncio.sleep(0.5)
         await asyncio.sleep(0.3)
 
-        inputEmail = browser.find_element(By.XPATH,  "//input[@data-anchor-id='IdentitySignupEmailField']")
+        inputEmail = browser.find_element(By.XPATH, "//input[@data-anchor-id='IdentitySignupEmailField']")
         await asyncio.sleep(0.3)
         for char in user['email']:
             inputEmail.send_keys(char)
@@ -98,44 +116,12 @@ async def signup(environment, browser, user):
         logger.info("Error while inputting signup form values")
 
     await asyncio.sleep(0.7)
-    signupButton = browser.find_element(By.XPATH,'//span[text()="Sign Up"]')
+    signupButton = browser.find_element(By.XPATH, '//span[text()="Sign Up"]')
     signupButton.click()
     await asyncio.sleep(4)
 
-    # async def add_account_data_to_profile():
-    #     await asyncio.sleep(4)
-    #     url = "http://localhost:3001"
-    #     account_details = {
-    #         'username': user['username'],
-    #         'password': user['password'],
-    #         'phoneNumber': user['number']
-    #     }
-    #     logger.info(account_details)
-    #     json_response = await HttpClient(url).post(f"/profile/{profile_id}/addAccount", account_details)
-    #     logger.info(json_response)
     #
-    # async def fetch_otp_details():
-    #     api_status = 1
-    #     while api_status not in [0, 2, 3, 4, 5, 6]:
-    #         try:
-    #             await asyncio.sleep(3)
-    #             async with aiohttp.ClientSession() as session:
-    #                 async with session.get(
-    #                         f"{environment['sms_pool_fetch_api']}?orderid={user['orderId']}&key={user['key']}") as response:
-    #                     if response.status == 200:
-    #                         json_data = await response.json()
-    #                         message = str(json_data['sms'])
-    #                         api_status = json_data['status']
-    #                         time_left = json_data['time_left']
-    #                         logger.info(json_data)
-    #                         await asyncio.sleep(4)
-    #                     else:
-    #                         logger.info('An error occurred while checking API status:' + str(response.status))
-    #                         break
-    #         except Exception as e:
-    #             logger.info('An error occurred while checking API status:' + str(e))
-    #     logger.info('[Status of the API is]' + str(api_status))
-    #     return api_status, message
+
     #
     # await asyncio.sleep(5)
     #
@@ -178,7 +164,27 @@ async def signup(environment, browser, user):
 
     await asyncio.sleep(5)
 
+    await add_account_data_to_profile(profile_id, user)
+
     # browser.close()
     browser.switch_to.default_content()
+
+    delivery_city = browser.find_element(By.ID, "HomeAddressAutocomplete")
+    for char in "New york":
+        delivery_city.send_keys(char)
+        await asyncio.sleep(0.5)
+
+    await asyncio.sleep(5)
+    try:
+        browser.find_element(By.XPATH,"//span[text()='Skip']").click()
+    except:
+        logger.info("Suggestion Popup not found")
+
+    find_restro_btn = browser.find_element(By.XPATH, "//button[@aria-label='Find Restaurants']")
+    find_restro_btn.click()
+
+    await asyncio.sleep(5)
+
+    await verify_phone(browser, environment, user)
 
     await asyncio.sleep(50)

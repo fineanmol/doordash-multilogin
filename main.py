@@ -11,13 +11,11 @@ logger = Logger.get_instance()
 
 
 async def main():
-    await sign_in_doordash_account()
     actions = {
         '1': create_multilogin_profile,
         '2': create_doordash_account,
-        '3': crawl,
+        '3': sign_in_doordash_account,
         '4': exit_program,
-
     }
 
     while True:
@@ -25,7 +23,7 @@ async def main():
               'Enter action to perform.\n' +
               '1. Create Multilogin Profile\n' +
               '2. Create Doordash Account\n' +
-              '3. Crawl \n' +
+              '3. SignIn Account \n' +
               '4. Exit\n' +
               '\n')
 
@@ -49,16 +47,17 @@ async def create_multilogin_profile():
 
 async def create_doordash_account():
     print("Creating Dordash Account...")
-    # jsonData = await HttpClient("http://localhost:3001").get("/profile/unused")
-    # for profile in jsonData['profiles']:
-    #     logger.info(profile['uuid'])
-    bot = Automation('uuid')
-    await bot.generate_doordash_account()
+    profiles = await HttpClient("http://localhost:3001").get("/profile/family/no-family")
+    for profile in profiles:
+        logger.info(profile['uuid'])
+        bot = Automation(profile['uuid'])
+        await bot.generate_doordash_account()
 
 
 async def sign_in_doordash_account():
-    bot = Automation('dummyUUid')
-    await bot.sign_in_to_doordash({})
+    profile = await HttpClient("http://localhost:3001").get("/profile/2888c04a-b06f-4c2a-b143-07d65484185c")
+    bot = Automation(profile['uuid'])
+    await bot.sign_in_to_doordash(profile['family']['parent'])
 
 
 def exit_program():

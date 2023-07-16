@@ -72,7 +72,7 @@ class Automation:
     async def sign_in_to_doordash(self, user):
         logger.info("sign_in_to_doordash")
         browser = await self.get_browser()
-        await signin(browser, user)
+        await signin(self.environment, browser, user)
         return browser
 
     async def doordash_like_posts(self, user, daily_limit):
@@ -99,7 +99,8 @@ class Automation:
     async def generate_doordash_account(self):
         CountryId = '1'
         profile = generate_profile()
-        user = {'firstName': profile['name'].split(" ")[0], 'lastName': profile['name'].split(" ")[1], 'email': profile['mail'],
+        user = {'firstName': profile['name'].split(" ")[0], 'lastName': profile['name'].split(" ")[1],
+                'email': profile['mail'],
                 'phoneNumber': generate_us_phone_number(), 'password': fake.password(length=12),
                 'name': profile['name'], 'address': generate_us_city_address("")}
 
@@ -109,26 +110,26 @@ class Automation:
             if element.name == 'United States':
                 CountryId = element.id
 
-        ServiceId = '457'
-        # jsonData = await HttpClient(self.environment['sms_pool_purchase_api']) \
-        #     .get(f"?key={self.environment['key']}&country={CountryId}&service={ServiceId}")
-        # phoneNumber = jsonData['phonenumber']
-        # orderId = jsonData['order_id']
-        # country = jsonData['country']
-        # success = jsonData['success']
-        # countryCode = jsonData['cc']
-        # message = jsonData['message']
+        ServiceId = '280'  # Doordash
+        jsonData = await HttpClient(self.environment['sms_pool_purchase_api']) \
+            .get(f"?key={self.environment['key']}&country={CountryId}&service={ServiceId}")
+        phoneNumber = jsonData['phonenumber']
+        orderId = jsonData['order_id']
+        country = jsonData['country']
+        success = jsonData['success']
+        countryCode = jsonData['cc']
+        message = jsonData['message']
 
-        # user['number'] = str(phoneNumber)
-        # user['orderId'] = orderId
-        # user['key'] = self.environment['key']
+        user['phoneNumber'] = str(phoneNumber)
+        user['orderId'] = orderId
+        user['key'] = self.environment['key']
 
-        # if message.startswith('This country is currently not available for this service'):
-        #     print('[Error Message]', {'jsonData': jsonData})
+        if message.startswith('This country is currently not available for this service'):
+            print('[Error Message]', {'jsonData': jsonData})
 
         browser = await self.get_browser()
 
-        await signup(self.environment, browser, user)
+        await signup(self.profile_id, self.environment, browser, user)
 
     async def get_browser(self):
         browser = await browser_multilogin(self.profile_id) \
