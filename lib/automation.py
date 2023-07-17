@@ -13,7 +13,8 @@ from constant import services
 from httpClient import HttpClient
 import undetected_chromedriver as uc
 
-from util.utility import generate_random_email, generate_us_phone_number, generate_us_city_address, generate_profile
+from util.utility import generate_random_email, generate_us_phone_number, generate_us_city_address, generate_profile, \
+    make_email_unique
 
 fake = Faker()
 service_list = services.ServiceList()
@@ -100,7 +101,7 @@ class Automation:
         CountryId = '1'
         profile = generate_profile()
         user = {'firstName': profile['name'].split(" ")[0], 'lastName': profile['name'].split(" ")[1],
-                'email': profile['mail'],
+                'email': make_email_unique(profile['mail']),
                 'phoneNumber': generate_us_phone_number(), 'password': fake.password(length=12),
                 'name': profile['name'], 'address': generate_us_city_address("")}
 

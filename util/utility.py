@@ -1,5 +1,6 @@
 import asyncio
 import random
+import string
 
 import aiohttp
 from random_address import real_random_address, random_address
@@ -106,3 +107,9 @@ def process_response(response):
         return response["success"], response["message"]
     elif "status" in response and "sms" in response:
         return response["status"], response["sms"]
+
+
+def make_email_unique(email):
+    username, domain = email.split('@', 1)
+    random_string = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(6))
+    return f"{username}_{random_string}@{domain}"
