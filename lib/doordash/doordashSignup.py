@@ -175,15 +175,18 @@ async def signup(profile_id, environment, browser, user):
         await asyncio.sleep(0.5)
 
     await asyncio.sleep(5)
-    try:
-        browser.find_element(By.XPATH,"//span[text()='Skip']").click()
-    except:
-        logger.info("Suggestion Popup not found")
 
     find_restro_btn = browser.find_element(By.XPATH, "//button[@aria-label='Find Restaurants']")
     find_restro_btn.click()
 
-    await asyncio.sleep(5)
+    await asyncio.sleep(15)
+
+    try:
+        browser.find_elements(By.XPATH,"//span[text()='Skip']")[0].click()
+    except:
+        logger.info("Suggestion Popup not found")
+
+    await asyncio.sleep(10)
 
     await verify_phone(browser, environment, user)
 

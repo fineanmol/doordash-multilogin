@@ -113,3 +113,23 @@ def make_email_unique(email):
     username, domain = email.split('@', 1)
     random_string = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(6))
     return f"{username}_{random_string}@{domain}"
+
+
+def get_referral_link(browser, environment, user):
+    try:
+        open_menu = browser.find_element(By.XPATH, "//button[@aria-label='Open Menu']")
+        open_menu.click()
+        await asyncio.sleep(5)
+
+        menu_referral_link = browser.find_element(By.XPATH,"//span[contains(text(), 'Get $') and contains(text(), "
+                                                           "' in Credits')]")
+        menu_referral_link.click()
+        await asyncio.sleep(15)
+
+        referral_link_elm = browser.find_element(By.XPATH,"//input[@aria-label='Share Your Link']")
+        referral_link = referral_link_elm.get_attribute("value")
+        logger.info(referral_link)
+        await asyncio.sleep(5)
+
+    except:
+        logger.info("Error while getting referral link")

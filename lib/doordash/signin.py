@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pickle
 
 from logger import Logger
-from util.utility import verify_phone
+from util.utility import verify_phone, get_referral_link
 
 logger = Logger.get_instance()
 
@@ -108,7 +108,8 @@ async def signin(environment, browser, user):
     save_cookie(browser, user['email'])
     await asyncio.sleep(5)
 
-    await verify_phone(browser, environment, user)
+    # await verify_phone(browser, environment, user)
+    await get_referral_link(browser,environment,user)
 
 
 async def update_profile_bio(browser, user, quote):
