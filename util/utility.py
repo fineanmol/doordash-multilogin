@@ -115,7 +115,7 @@ def make_email_unique(email):
     return f"{username}_{random_string}@{domain}"
 
 
-def get_referral_link(browser, environment, user):
+async def get_referral_link(browser, environment, user):
     try:
         open_menu = browser.find_element(By.XPATH, "//button[@aria-label='Open Menu']")
         open_menu.click()
