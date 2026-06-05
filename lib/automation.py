@@ -57,6 +57,17 @@ input_environment = os.environ.get('ENVIRONMENT', 'Local')
 env = config[input_environment]
 
 
+def get_smspool_api_key(section):
+    """Return SMS Pool API key from SMSPOOL_API_KEY env or config.ini (see config.ini.example)."""
+    env_key = os.environ.get('SMSPOOL_API_KEY')
+    if env_key:
+        return env_key
+    config_key = section.get('key', '')
+    if config_key and config_key != 'YOUR_SMSPOOL_API_KEY':
+        return config_key
+    return ''
+
+
 async def browser_multilogin(profile_id):
     json_response = await HttpClient("http://127.0.0.1:35000/api/v1/profile") \
         .get(f"/start?automation=true&profileId={profile_id}")
@@ -110,8 +121,9 @@ class Automation:
                 CountryId = element.id
 
         ServiceId = '457'
+        # sms_key = get_smspool_api_key(self.environment)
         # jsonData = await HttpClient(self.environment['sms_pool_purchase_api']) \
-        #     .get(f"?key={self.environment['key']}&country={CountryId}&service={ServiceId}")
+        #     .get(f"?key={sms_key}&country={CountryId}&service={ServiceId}")
         # phoneNumber = jsonData['phonenumber']
         # orderId = jsonData['order_id']
         # country = jsonData['country']
@@ -121,7 +133,7 @@ class Automation:
 
         # user['number'] = str(phoneNumber)
         # user['orderId'] = orderId
-        # user['key'] = self.environment['key']
+        # user['key'] = get_smspool_api_key(self.environment)
 
         # if message.startswith('This country is currently not available for this service'):
         #     print('[Error Message]', {'jsonData': jsonData})

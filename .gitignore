@@ -7,3 +7,4 @@ multilogin.log
 /.idea/inspectionProfiles/Project_Default.xml
 /.idea/vcs.xml
 .vscode/settings.json
+config.ini

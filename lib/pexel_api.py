@@ -9,7 +9,10 @@ fake = Faker()
 
 async def download_random_image():
     file_path = 'random_image.jpg'
-    api_key = 'REDACTED_PEXELS_API_KEY'
+    api_key = os.environ.get('PEXELS_API_KEY')
+    if not api_key:
+        print("PEXELS_API_KEY is not set; skipping Pexels download")
+        return None
 
     headers = {"Authorization": api_key}
     async with aiohttp.ClientSession(headers=headers) as session:
@@ -34,10 +37,3 @@ async def download_random_image():
                         print("Failed to download random image")
             else:
                 print("Failed to get random image URL")
-
-
-# Example usage:
-# loop = asyncio.get_event_loop()
-# absolute_file_path = loop.run_until_complete(download_random_image(api_key, file_name))
-# if absolute_file_path:
-#     print(f"Absolute file path: {absolute_file_path}")
